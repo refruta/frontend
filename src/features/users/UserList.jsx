@@ -3,10 +3,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 export function UserList() {
-  return(<div>
-        <marquee><h1>Submitted Successfully you will get result in some time</h1>
+  return(<div class="bg-light">
+
+  <div className="container ">
+  <div>
+        <marquee class="text-success" behavior="alternate" ><h1>Test Submitted Successfully wait till you get result</h1>
         </marquee>
-        </div>)
+ </div>
+    <div class="img-fluid">
+        <div class="img-fluid text-center">
+        <marquee direction="up" behavior="slide"> <img src="https://www.actioncoach.com/wp-content/uploads/2015/07/stress-management.jpg" alt="Responsive image" width="100%" ></img></marquee>
+        </div>
+    </div>
+  </div>
+    </div>
+        )
  /* const dispatch = useDispatch();
 
   const { entities } = useSelector((state) => state.users);

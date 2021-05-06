@@ -2,12 +2,12 @@ import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-//import { useHistory } from "react-router-dom";
+import { useDispatch,useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { signUpUser } from "./usersSlice";
 export function AddUser() {
   const dispatch = useDispatch();
-//  const history = useHistory();
+  const history = useHistory();
   const [error, setError] = useState(null);
 
   const [name, setName] = useState("");
@@ -15,12 +15,15 @@ export function AddUser() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
-
+  const { isSuccess,isError,errorMessage,successMessage } = useSelector((state) => state.users);
   const handleName = (event) => setName(event.target.value);
   const handleUserName = (event) => setUserName(event.target.value);
   const handleEmail = (event) => setEmail(event.target.value);
   const handlePassword = (event) => setPassword(event.target.value);
   const handleRole = (event) => setRole(event.target.value)
+  if(isSuccess){
+    history.push("/adminlogin")
+  }
   const handleClick = () => {
     if (name && username && email && password && role) {
       dispatch(
@@ -32,13 +35,14 @@ export function AddUser() {
           role,
         })
       );
-    //   history.push("/userlist");
+      // history.push("/adminlogin");
+        setError('')
     }else{
       setError("Fill in all fields");
     }
   };
   return (
-    <form>
+    <form class="container" >
       <div className="col-md-6 container">
         <h3 className="text-center">Register</h3>
         <div className="form-group">
@@ -86,7 +90,15 @@ export function AddUser() {
             onChange={handleRole}
           />
         </div>
-          <h6>{error}</h6>
+        <div>
+     {successMessage}
+     {isError || errorMessage != null ? (
+        <h6 >{errorMessage} </h6> 
+      ) : (
+        <> </>
+      )}
+     {error}
+     </div> 
         <button
           type="button"
           className="btn btn-primary btn-block"
@@ -94,12 +106,11 @@ export function AddUser() {
         >
           Register
         </button>
-        <p className="mt-2 forgot-password d-flex justify-content-end">
+        <p className="mt-2  d-flex justify-content-end">
           Already registered?{" "}
           <Link className="nav-link pt-0 pr-0" to="/adminlogin">
             Login here
           </Link>
-          {/* <a href="#">Login here</a> */}
         </p>
       </div>
     </form>

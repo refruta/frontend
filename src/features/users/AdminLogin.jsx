@@ -9,7 +9,7 @@ import { signInUser } from "./usersSlice";
 export function AdminLogin() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { isUserLoggedIn,isError, errorMessage, isAdminLoggedIn } = useSelector(
+  const { isUserLoggedIn,isError, errorMessage, isAdminLoggedIn,successMessage } = useSelector(
     (state) => state.users
   );
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ else if(isUserLoggedIn){
         }catch(Exception){
         alert('error')
       }
-      
+      setError('')
     }
     else{
       setError("Fill in all fields")
@@ -75,8 +75,6 @@ else if(isUserLoggedIn){
             </label>
           </div>
         </div>
-          <h6>{error}</h6>
-
         <button
           type="button"
           className="btn btn-primary btn-block"
@@ -84,12 +82,17 @@ else if(isUserLoggedIn){
         >
           Submit
         </button>
+        <div class="text-danger">
+
         {isError || error != "" ? (
-          <h6 >{errorMessage} {error}</h6> 
-        ) : (
-          <></>
-        )}
-        
+          <div>
+            <h5>{error}</h5>
+             <h5>{errorMessage}</h5>
+             </div>
+   ) : (
+            <></>
+            )}
+            </div>
       </div>
     </form>
   );

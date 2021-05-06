@@ -2,35 +2,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from "react-router-dom";
 
 export function HomePage () {
+  return (<div class="bg-light">
 
-  return (
-    <div className="container">
-      <div className="row">
-        <h1>Online Exam Portal</h1>
+<div className="container ">
+  <div class="img-fluid">
+      <div class="img-fluid text-center">
+     <Link to ="/add-user">
+      <img src="https://i2.wp.com/www.freestudentprojects.com/wp-content/uploads/2013/04/Online-Examin-Portal.jpg?fit=1024%2C682&ssl=1" alt="Responsive image" width="75%" ></img>
+      </Link>
       </div>
-      <div className="row">
-        <div className="two columns">
-          <Link to="/add-user">
-            <button className="button-primary">Registration</button>
-          </Link>
-        </div>
-      </div>
-      
-      <div className="row">
-        <div className="two columns">
-          <Link to="/adminlogin">
-            <button className="button-primary">Admin Login</button>
-          </Link>
-        </div>
-      </div>
-      <div className="row">
-        <div className="two columns">
-          <Link to="/login">
-            <button className="button-primary">User Login</button>
-          </Link>
-        </div>
-      </div>
-
-      </div>
+  </div>
+</div>
+  </div>
   );
 }

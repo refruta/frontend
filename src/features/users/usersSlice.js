@@ -57,10 +57,18 @@ export const signUpUser = createAsyncThunk("users/signUpUser", async (userDetail
   try {
      const response =  axios.post("http://localhost:8080/api/auth/signup",body)
      console.log('Sign up api response:- ', response)
-     return response.data;
+    // return response.data;
+     let obj = {
+      status: 200, ...response.data
+      }
+      return obj;
+      //return response.data;
   } catch (err) {
-      console.log(err);
-      return null;
+      console.log(err); 
+      let obj = {
+        status : 500 , ...err.response.data
+      }
+      return obj;
   }
 });
 
@@ -282,29 +290,43 @@ const usersSlice = createSlice({
     isAdminLoggedIn: false,
     isUserLoggedIn :false,
     userid:'',
+    isSuccess: false
   },
   reducers: {
-    userUpdated(state, action) {
-      const { id, name, email } = action.payload;
-      const existingUser = state.entities.find((user) => user.id === id);
-      if (existingUser) {
-        existingUser.name = name;
-        existingUser.email = email;
-      }
-    },
-    userDeleted(state, action) {
-      const { id } = action.payload;
-      const existingUser = state.entities.find((user) => user.id === id);
-      if (existingUser) {
-        state.entities = state.entities.filter((user) => user.id !== id);
-      }
-    },
+    
   },
   extraReducers: {
+    [signUpUser.pending]: (state, action) => {
+      state.loading = true;
+  },
+  
+    [signUpUser.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.entity = action.payload
+      if(action.payload.status == 200){
+        state.isError=false;
+        state.errorMessage='';
+        state.isSuccess = true
+      }
+      else{
+          state.isError=true;
+          state.errorMessage=action.payload.message;
+          state.isSuccess = false;
+        }
+      },
+  [signUpUser.rejected]: (state, action) => {
+    alert("rejected")
+    state.loading = false;
+    state.isError = true;
+    state.errorMessage=action.payload.message;
+    state.isSuccess = false;
+  },
+
     [signInUser.pending]: (state, action) => {
       state.loading = true;
   },
-  [signInUser.fulfilled]: (state, action) => {
+  
+    [signInUser.fulfilled]: (state, action) => {
     if(action.payload.authorities){
       var role = action.payload.authorities[0].authority;
     }
