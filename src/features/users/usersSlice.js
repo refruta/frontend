@@ -2,34 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 var accesstoken  = ''
 var userid=''
-export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
-  const response = await fetch(" http://localhost:8080/api/product/view");
-  const users = await response.json();
-  return users;
-});
-
 export const signInUser = createAsyncThunk("users/signInUser", async (userDetails) => {
-  /*await axios.post("http://localhost:8080/api/auth/signin", userDetails).then((response)=>{
-    // console.log('Sign In api response' , response.data);
-    
-    /*console.log(response);
-    console.log(response.data.accessToken);
-    accesstoken = response.data.accessToken;
-   let obj = {
-    status: 200, ...response.data
-    }
-   console.log(obj)
-    return obj;
-  // return response.data;
-  },(error)=>{alert("Enter the correct details") ;console.log(error)})
- */ try {
+   try {
       const response = await axios.post("http://localhost:8080/api/auth/signin", userDetails);
       console.log('Sign In api response:- ', response)
       const user = await axios.get("http://localhost:8080/find/getByUsername/"+response.data.username)
       userid = user.data.id
-      alert(userid)
       accesstoken = response.data.accessToken;
-      alert(accesstoken)
       let obj = {
       status: 200, ...response.data
       }
@@ -45,8 +24,6 @@ export const signInUser = createAsyncThunk("users/signInUser", async (userDetail
 
 export const signUpUser = createAsyncThunk("users/signUpUser", async (userDetails) => {
     var [role] = [userDetails.role]
-    alert(role)
-  alert(userDetails.role)
   let body = {
           name :userDetails.name,
           username: userDetails.username,
@@ -74,16 +51,23 @@ export const signUpUser = createAsyncThunk("users/signUpUser", async (userDetail
 
 export const addSubject = createAsyncThunk("users/addSubject", async (subjectDetails) => {
   try {
-    alert(accesstoken)
      const response =  axios.post("http://localhost:8080/admin/addSub",subjectDetails,{
       headers: {
           'Authorization': 'Bearer ' + accesstoken
       }
   });
      console.log('Add Subject api response:- ', response)
-     return response.data;
+     let obj = {
+      status: 200, ...response.data
+      }
+      return obj;
+      //return response.data;
   } catch (err) {
-      console.log(err);
+      console.log(err); 
+      let obj = {
+        status : 500 , ...err.response.data
+      }
+      return obj;
   }
 });
 export const addQuestion = createAsyncThunk("users/addQuestion",async (questionDetails) => {
@@ -92,11 +76,16 @@ export const addQuestion = createAsyncThunk("users/addQuestion",async (questionD
       headers: {
           'Authorization': 'Bearer ' + accesstoken
       }
-  });
-     console.log('Question Added:- ', response)
-     return response.data;
-  } catch (err) {
-      console.log(err);
+  }); let obj = {
+    status : 200, ...response.data
+  }
+   return obj
+} catch (err) {
+    console.log(err);
+    let obj ={
+      status:500, ...err.response.data
+    }
+    return obj
   }
 });
 
@@ -126,7 +115,7 @@ export const getQuestion = createAsyncThunk("users/getQuestion", async (id) => {
           'Authorization': 'Bearer ' + accesstoken
       }
   });
-     console.log('Got Question By Id :- ', response)
+     //console.log('Got Question By Id :- ', response)
      return response.data;
   } catch (err) {
       console.log(err);
@@ -157,9 +146,8 @@ export const createTest = createAsyncThunk("users/createTest",async (details) =>
     var userId = details.userId;
     var subjectId = details.subject_id
     var lev = details.level;
-    alert(userId + subjectId + lev)
   try {
-    const response =  axios.post("http://localhost:8080/test/start-test/" + userId + "/" +subjectId+"/"+ lev ,details ,{
+    const response = await axios.post("http://localhost:8080/test/start-test/" + userId + "/" +subjectId+"/"+ lev ,details ,{
       headers: {
           'Authorization': 'Bearer ' + accesstoken
       }
@@ -264,7 +252,6 @@ export const getReport = createAsyncThunk("users/getReport", async (reportId) =>
 });
 
 export const getAllReport = createAsyncThunk("users/getAllReport", async () => {
-    alert(userid)
   try {
      let response =  await axios.get("http://localhost:8080/test/getAllReportsForUser/" + userid ,{
       headers: {
@@ -315,7 +302,6 @@ const usersSlice = createSlice({
         }
       },
   [signUpUser.rejected]: (state, action) => {
-    alert("rejected")
     state.loading = false;
     state.isError = true;
     state.errorMessage=action.payload.message;
@@ -354,110 +340,182 @@ const usersSlice = createSlice({
   [signInUser.rejected]: (state, action) => {
       state.loading = false;
   },
+  
+  [addSubject.pending]: (state, action) => {
+    state.loading = true;
+    state.isSuccess=false;
+    state.successMessage=''
+},
+
+  [addSubject.fulfilled]: (state, action) => {
+    state.loading = false;
+    state.entity = action.payload
+    if(action.payload.status == 200){
+      state.isError=false;
+      state.errorMessage='';
+      state.isSuccess = true
+      state.successMessage='Subject Added Successfully'
+    }
+    else if(state.action.payload !=200 ){
+        state.isError=true;
+        state.errorMessage=action.payload.message;
+        state.isSuccess = false;
+        state.successMessage='Problem in adding subject'
+      }
+    },
+[addSubject.rejected]: (state, action) => {
+  state.loading = false;
+  state.isError = true;
+  state.successMessage='';
+  state.errorMessage=action.payload.message;
+  state.isSuccess = false;
+},
+
+ 
+[addQuestion.pending]: (state, action) => {
+  state.loading = true;
+  state.isSuccess=false;
+  state.successMessage=''
+},
+
+[addQuestion.fulfilled]: (state, action) => {
+  state.loading = false;
+  state.entity = action.payload
+  if(action.payload.status == 200){
+    state.isError=false;
+    state.errorMessage='';
+    state.isSuccess = true
+    state.successMessage='Question Added Successfully'
+  }
+  else if(state.action.payload !=200 ){
+      state.isError=true;
+      state.errorMessage=action.payload.message;
+      state.isSuccess = false;
+      state.successMessage='Problem in adding subject'
+    }
+  },
+[addQuestion.rejected]: (state, action) => {
+state.loading = false;
+state.isError = true;
+state.successMessage='';
+state.errorMessage=action.payload.message;
+state.isSuccess = false;
+},
+
+
 [createReport.pending]: (state, action) => {
     state.loading = true;
 },
 [createReport.fulfilled]: (state, action) => {
-  //state.loading = false;
-  if((action.payload.status == 200)) {
-    state.loading = false;
-    state.entities = action.payload
-    state.successMessage = 'Report Created Successfully'
+  state.loading = false;
+  state.entity = action.payload
+  if(action.payload.status == 200){
+    state.isSuccess = true;
+    state.successMessage = 'Report Created Successfully ';
   }
-   else if(action.payload.status == 500){
-        state.loading = false;
-        state.entities = action.payload
-        state.isError = true;
-        alert(action.payload.message)
-        state.errorMessage = action.payload.message
-        state.successMessage='Failed To Create Report'
-   }
+  else if(action.payload.status == 500){
+    console.log('failed with 500')
+    state.isError=true;
+    state.isSuccess=false;
+    state.errorMessage='Invalid Details'
+  }
+  else{
+    console.log('failed with other')
+    state.isError=true;
+    state.isSuccess=false;
+    state.errorMessage=action.payload.message
+    
+  }
 },
 [createReport.rejected]: (state, action) => {
+  console.log('in rejected')
     state.loading = false;
-    state.isError = true;
-    state.errorMessage = action.payload.message
 },
 
 [getReport.pending]: (state, action) => {
-  state.entity = action.payload
   state.loading = true;
 },
 [getReport.fulfilled]: (state, action) => {
 //state.loading = false;
-state.loading = true
-if((action.payload.status == 200)) {
+state.loading = true;
+state.entity = action.payload;
+if(action.payload.status == 200){
   state.loading = false;
-  state.entity = action.payload
-  state.successMessage = 'Report'
+  state.isSuccess=true
+  state.isError=false
 }
- else if(action.payload.status == 500){
-      state.loading = false;
-      state.entity = action.payload
-      state.isError = true;
-      alert(action.payload.message)
-      state.errorMessage = action.payload.message
-      state.successMessage='No Report'
- }
- else{
-   state.errorMessage = action.payload.message
- }
-},
-[getReport.rejected]: (state, action) => {
+else if(action.payload.status == 500){
+  state.loading = true;
+  state.isError = true;
+  state.errorMessage = 'No Report For Id'
+  state.isSuccess=false
+}
+else{
+  state.loading = true;
   state.isError = true;
   state.errorMessage = action.payload.message
+  state.isSuccess=false
+}
+},
+[getReport.rejected]: (state, action) => {
   state.loading = true;
+  state.isError=true
+  state.isSuccess=false
+  state.errorMessage=''
+  state.successMessage=''
 },
 
-
-  [fetchUsers.pending]: (state, action) => {
-      state.loading = true;
-    },
-    [fetchUsers.fulfilled]: (state, action) => {
-      state.loading = false;
-      state.entities = [...state.entities, ...action.payload];
-    },
-    [fetchUsers.rejected]: (state, action) => {
-      state.loading = false;
-    },
     [getSubject.pending]: (state, action) => {
       state.loading = true;
   },
   [getSubject.fulfilled]: (state, action) => {
-      state.loading = false;
+      state.loading = true;
       state.entity = action.payload;
       if(action.payload.status == 200){
         state.loading = false;
+        state.isSuccess=true
+        state.isError=false
       }else{
-        state.loading = false;
+        state.loading = true;
         state.isError = true;
         state.errorMessage = action.payload.message
+        state.isSuccess=false
       }
     },
   [getSubject.rejected]: (state, action) => {
-      state.loading = false;
+      state.loading = true;
+      state.isError=true
+      state.isSuccess=false
+      state.errorMessage=''
+      state.successMessage=''
   },
+  
 [getQuestion.pending]: (state, action) => {
     state.loading = true;
 },
 [getQuestion.fulfilled]: (state, action) => {
-    state.loading = false;
-    //console.log(action.payload)
-    state.entities = action.payload;
+      state.loading=false
+      console.log(action.payload)
+      state.entities = action.payload;
   },
 [getQuestion.rejected]: (state, action) => {
     state.loading = false;
-},
+    state.isError=true;
+  },
 [getQuestions.pending]: (state, action) => {
   state.loading = true;
+  state.isSuccess=false;
+
 },
 [getQuestions.fulfilled]: (state, action) => {
   state.loading = false;
   //console.log(action.payload)
   state.entities = action.payload;
+  state.isSuccess=true;
 },
 [getQuestions.rejected]: (state, action) => {
   state.loading = false;
+  state.isSuccess = false;
 },
 [getAllReport.pending]: (state, action) => {
   state.loading = true;
@@ -491,12 +549,15 @@ if((action.payload.status == 200)) {
 },
 [createTest.fulfilled]: (state, action) => {
   state.loading = false;
-  state.entities = action.payload;
+  state.entity = action.payload;
   if(action.payload.status == 200){
+    state.isSuccess = true;
     state.successMessage = 'Test Created Successfully ';
   }
-  else{
-    state.errorMessage = action.payload.message
+  else {
+    state.isError=true;
+    state.isSuccess=false;
+    state.errorMessage=action.payload.message
   }
 },
 [createTest.rejected]: (state, action) => {

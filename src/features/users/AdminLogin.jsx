@@ -30,7 +30,6 @@ else if(isUserLoggedIn){
           dispatch(signInUser({username, password})) 
         //history.push("/adminpage");
         }catch(Exception){
-        alert('error')
       }
       setError('')
     }

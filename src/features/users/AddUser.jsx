@@ -22,7 +22,7 @@ export function AddUser() {
   const handlePassword = (event) => setPassword(event.target.value);
   const handleRole = (event) => setRole(event.target.value)
   if(isSuccess){
-    history.push("/adminlogin")
+    history.push("/login")
   }
   const handleClick = () => {
     if (name && username && email && password && role) {
@@ -108,7 +108,7 @@ export function AddUser() {
         </button>
         <p className="mt-2  d-flex justify-content-end">
           Already registered?{" "}
-          <Link className="nav-link pt-0 pr-0" to="/adminlogin">
+          <Link className="nav-link pt-0 pr-0" to="/login">
             Login here
           </Link>
         </p>

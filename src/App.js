@@ -30,7 +30,7 @@ export default function App() {
           <Route path="/edit-user">
             <EditUser />
           </Route>
-          <Route path="/adminlogin">
+          <Route path="/login">
             <AdminLogin />
           </Route>
           <Route path="/home">

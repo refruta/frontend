@@ -1,0 +1,15 @@
+#f{
+    background-image: url(https://th.bing.com/th/id/OIP.5wo0LTB57jGjm2OERNKsRAAAAA?pid=ImgDet&w=388&h=304&rs=1);
+}
+label{
+    font-size: medium;
+    font-style: italic;
+}
+#failure{
+    background-color: red;
+    font-weight: 900;
+}
+#s{
+    background-color: green;
+    font-weight: 900;
+}
